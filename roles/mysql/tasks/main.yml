@@ -1,0 +1,57 @@
+- name: install mariadb
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - mariadb
+    - mariadb-server
+    - MySQL-python
+
+- name: started mariadb
+  systemd:
+    name: mariadb
+    state: started
+    enabled: yes
+
+- name: enable firewalld for mariadb
+  firewalld:
+    permanent: true
+    service: mysql
+    state: enabled
+    immediate: true
+
+#- name: copy .my.cnf
+#  copy:
+#    src: ".my.cnf"
+#    dest: /root/.my.cnf
+#    owner: root
+#    group: root
+#    mode: 0600
+
+- name: create database
+  mysql_db:
+    login_user: root
+    login_password: Hogehoge!1
+    name: "{{ db_name }}"
+    state: present
+    encoding: utf8
+
+#- name: set root passwd
+#  mysql_user:
+#    name: root
+#    host: "{{ item }}"
+#    password: Hogehoge!1
+#  with_items:
+#    - 127.0.0.1
+#    - localhost
+
+- name: create db user
+  mysql_user:
+    login_user: root
+    login_password: Hogehoge!1
+    name: "{{ db_user }}"
+    password: Hogehoge!2
+    priv: "wordpress.*:ALL"
+    host: "%"
+    state: present
+    append_privs: yes
